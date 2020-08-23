@@ -1,8 +1,9 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
-const Users = require('./models/users');
-const Sauces = require('./models/sauces');
+
+const sauceRoutes = require('./routes/sauces');
+const userRoutes = require('./routes/user');
 
 mongoose.connect('mongodb+srv://olivier:avenir@cluster0.4s4ii.mongodb.net/piquante?retryWrites=true&w=majority',
   { useNewUrlParser: true,
@@ -20,41 +21,7 @@ app.use((req, res, next) => {
   });
   app.use(bodyParser.json());
 
-  app.post('/api/auth/signup', (req, res, next) => {
-    const users = new Users({
-      ...req.body
-    });
-    users.save()
-      .then(() => res.status(201).json({ message: 'user enregistré !'}))
-      .catch(error => res.status(400).json({ error }));
-  });
-
-  app.post('/api/auth/login', (req, res, next) => {
-    Users.find()
-    .then(users => res.status(200).json(users))
-    .catch(error => res.status(400).json({ error }));
-    });
-
-  app.post('/api/sauces', (req, res, next) => {
-    delete req.body._id;
-     
-
-    const sauce = new Sauces({
-    name : req.body.name,
-    description : req.body.description,
-    manufacturer : req.body.manufacturer,
-    mainPepper : req.body.mainPepper,
-    heat : req.body.heat,
-    userId :'234',
-    likes : 1,
-    dislikes : 1,
-    usersLiked : "2sdfs",
-    usersDisliked : "fff" ,
-    });
-    console.log(sauce);
-    sauce.save()
-      .then(() => res.status(201).json({ message: 'Sauce enregistrée !'}))
-      .catch(error => res.status(400).json({ error }));
-  });
+app.use('/api/auth', userRoutes);
+app.use('/api/sauces', sauceRoutes);
 
 module.exports = app;
